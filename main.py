@@ -9,7 +9,14 @@ from starlette.applications import Starlette
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
 import json
 
+from uniswap import UniswapConnect
+
 app = FastAPI()
+uni = UniswapConnect()
+
+# issues:
+# https://github.com/Uniswap/v3-subgraph/issues/120
+
 
 class TokenType(ObjectType):
     address = String()
@@ -20,14 +27,15 @@ class TokenType(ObjectType):
     logoURI = String()
     coingeckoId = String()
 
+class Pairs(ObjectType):
+    pass
+
 
 class TokenQuery(ObjectType):
     token_list = None
     get_tokenlist = List(TokenType)
     async def resolve_get_tokenlist(self, info):
-        with open("./tokenlists/ethereum.json") as courses:
-            token_list = json.load(courses)
-        return token_list
+        return uni.token_list
 
 
 @app.get("/")
