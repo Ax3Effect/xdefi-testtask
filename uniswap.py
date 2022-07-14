@@ -39,7 +39,38 @@ class UniswapConnect:
                 continue
             
             destinations.append(destination_data)
-        return destinations
+        return destinations, data['token']
+    
+    async def find_optimal_route(self, address1, address2):
+        destinations1, data1 = await self.process_pool_pairs(address1)
+        destinations2, data2 = await self.process_pool_pairs(address2)
+
+        already_found = False
+        # simplify
+        destinations_list1 = []
+        for destination in destinations1:
+            if destination['symbol'] == data2['symbol']:
+                # already found 1-1 swap
+                already_found = True
+                #print("{} -> {}".format(data1['name'], data2['name']))
+                break
+            destinations_list1.append(destination['symbol'])
+
+        if not already_found:
+            destinations_list2 = []
+            for destination in destinations2:
+                destinations_list2.append(destination['symbol'])
+            
+            print("Pools for {}: {}".format(data1['symbol'], destinations_list1))
+            print("Pools for {}: {}".format(data2['symbol'], destinations_list2))
+
+            common_swaps = list(set(destinations_list1).intersection(destinations_list2))
+            #print(common_swaps)
+            print("{} -> {} -> {}".format(data1['name'], common_swaps, data2['name']))
+        else:
+            print("{} -> {} (direct swap)".format(data1['name'], data2['name']))
+
+
 
     
     async def send_uniswap_request(self, gql_query, variables={}):
@@ -59,7 +90,7 @@ class UniswapConnect:
             return result
 
 async def test():
-    a = await UniswapConnect().process_pool_pairs('0x6B175474E89094C44Da98b954EedeAC495271d0F')
+    a = await UniswapConnect().find_optimal_route('0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0', '0xBB0E17EF65F82Ab018d8EDd776e8DD940327B28b')
     print(a)
 
 if __name__ == '__main__':
