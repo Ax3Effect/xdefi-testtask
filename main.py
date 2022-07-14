@@ -2,7 +2,7 @@ from typing import Union
 import asyncio
 
 from fastapi import FastAPI
-from graphene import ObjectType, List, String, Int, Schema
+from graphene import ObjectType, List, String, Int, Schema, Field
 import graphene
 
 from starlette.applications import Starlette
@@ -27,15 +27,29 @@ class TokenType(ObjectType):
     logoURI = String()
     coingeckoId = String()
 
+class Token(ObjectType):
+    id = String()
+    symbol = String()
+
 class Pairs(ObjectType):
-    pass
+    id = String()
+    token0 = Field(Token)
+    token1 = Field(Token)
+    liquidity = String()
+    feeTier = String()
 
 
 class TokenQuery(ObjectType):
     token_list = None
     get_tokenlist = List(TokenType)
+    get_pairslist = List(Pairs)
+
     async def resolve_get_tokenlist(self, info):
         return uni.token_list
+
+    async def resolve_get_pairslist(self, info):
+        data = (await uni.get_available_pools('0xc00e94cb662c3520282e6f5717214004a7f26888'))['token']['whitelistPools']
+        return data
 
 
 @app.get("/")
