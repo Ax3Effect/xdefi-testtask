@@ -4,6 +4,7 @@ import json
 
 from fastapi import FastAPI
 from graphene import ObjectType, List, String, Int, Schema, Field
+from graphene.types import generic
 import graphene
 
 from starlette.applications import Starlette
@@ -53,7 +54,7 @@ async def resolve_routes(data, info):
 class Route(ObjectType):
     from_address = String(required=True)
     to_address = String(required=True)
-    result = String(resolver=resolve_routes)
+    result = generic.GenericScalar(resolver=resolve_routes)
 
 
 class Query(ObjectType):
@@ -73,24 +74,51 @@ class Query(ObjectType):
         to_address = kwargs.get('to')
         data = (await uni.find_optimal_route(from_address, to_address))
         return data
+
+class RouteInput(graphene.InputObjectType):
+    from_address = graphene.String(required=True)
+    to_address = graphene.String(required=True)
     
 class CreateRoute(graphene.Mutation):
     class Arguments:
-        from_address = graphene.String()
-        to_address = graphene.String()
-    
-    ok = graphene.Boolean()
+        address = RouteInput(required=True)
+
     route = graphene.Field(lambda: Route)
 
-    def mutate(root, info, from_address, to_address):
-        person = Route(from_address=from_address, to_address=to_address)
-        ok = True
-        return Mutation(route=route, ok=ok)
+    def mutate(root, info, address=None):
+        data = (uni.find_optimal_route(address.from_address, to_address=address.to_address))
+        print(data)
+        route = Route(from_address=address.from_address, to_address=address.to_address)
+        return CreateRoute(route=route)
 
+class Person(graphene.ObjectType):
+    name = graphene.String()
+    age = graphene.Int()
+
+# We must define a query for our schema
+class Mutations(graphene.ObjectType):
+    person = graphene.Field(Person)
+
+
+class PersonInput(graphene.InputObjectType):
+    name = graphene.String(required=True)
+    age = graphene.Int(required=True)
+
+class CreatePerson(graphene.Mutation):
+    class Arguments:
+        person_data = PersonInput(required=True)
+
+    person = graphene.Field(Person)
+
+    def mutate(root, info, person_data=None):
+        person = Person(
+            name=person_data.name,
+            age=person_data.age
+        )
+        return CreatePerson(person=person)
 
 class MyMutations(graphene.ObjectType):
     create_route = CreateRoute.Field()
-
 
 @app.get("/")
 def read_root():

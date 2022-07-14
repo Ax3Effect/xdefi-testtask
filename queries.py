@@ -1,6 +1,7 @@
 UNISWAP_GET_POOLS = '''
 query getToken($tokenid: ID!) {
   token(id: $tokenid) {
+    id,
     symbol,
     name,
     whitelistPools (

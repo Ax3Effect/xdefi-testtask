@@ -41,11 +41,12 @@ class UniswapConnect:
             destinations.append(destination_data)
         return destinations, data['token']
     
-    async def find_optimal_route(self, address1, address2):
-        destinations1, data1 = await self.process_pool_pairs(address1)
-        destinations2, data2 = await self.process_pool_pairs(address2)
+    async def find_optimal_route(self, from_address, to_address):
+        destinations1, data1 = await self.process_pool_pairs(from_address)
+        destinations2, data2 = await self.process_pool_pairs(to_address)
 
         already_found = False
+        print("-----------> {}".format(data1))
         # simplify
         destinations_list1 = []
         for destination in destinations1:
@@ -69,6 +70,7 @@ class UniswapConnect:
             print("{} -> {} -> {}".format(data1['name'], common_swaps, data2['name']))
         else:
             print("{} -> {} (direct swap)".format(data1['name'], data2['name']))
+            common_swaps = None
 
 
         result = {
@@ -78,7 +80,7 @@ class UniswapConnect:
             'to_id': data2['id'],
             'to_symbol': data2['symbol'],
             'to_name': data2['name'],
-            'sides': None
+            'sides': common_swaps
         }
 
         return result
