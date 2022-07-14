@@ -71,6 +71,18 @@ class UniswapConnect:
             print("{} -> {} (direct swap)".format(data1['name'], data2['name']))
 
 
+        result = {
+            'from_id': data1['id'],
+            'from_symbol': data1['symbol'],
+            'from_name': data1['name'],
+            'to_id': data2['id'],
+            'to_symbol': data2['symbol'],
+            'to_name': data2['name'],
+            'sides': None
+        }
+
+        return result
+
 
     
     async def send_uniswap_request(self, gql_query, variables={}):
