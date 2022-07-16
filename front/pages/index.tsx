@@ -1,3 +1,4 @@
+
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -5,10 +6,10 @@ import styles from '../styles/Home.module.css'
 import { gql } from "@apollo/client";
 import client from "../apollo-client";
 import TokenList from "../components/TokenList"
-import { Fragment, useState } from 'react'
+import { Fragment, useState, createRef } from 'react'
 import { Token } from 'graphql';
 
-const Home: NextPage = (token, selectedFrom, setSelectedFrom, selectedTo, setSelectedTo) => {
+const Home: NextPage = (token: any) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -24,7 +25,7 @@ const Home: NextPage = (token, selectedFrom, setSelectedFrom, selectedTo, setSel
 
         <p className={styles.description}>
           Get started by selecting input and output tokens{' '}
-          <span><TokenList tokens={token} selected={selectedFrom} setSelected={setSelectedFrom} /> -> <TokenList tokens={token} /></span> 
+          <TokenList tokens={token}  /> 
         </p>
 
         
@@ -47,35 +48,30 @@ const Home: NextPage = (token, selectedFrom, setSelectedFrom, selectedTo, setSel
 }
 
 export default Home
-export async function getStaticProps() {
-  const { data } = await client.query({
-    query: gql`
-      query {
-        token {
-          address
-          symbol
-          name
-          decimals
-          chainId
-          logoURI
-          coingeckoId
+  export async function getStaticProps() {
+    const { data } = await client.query({
+      query: gql`
+        query {
+          token {
+            address
+            symbol
+            name
+            decimals
+            chainId
+            logoURI
+            coingeckoId
+          }
         }
-      }
-    `,
-  });
-  console.log(data.token.slice(0, 5))
-  const tokens = data.token.slice(0, 100)
+      `,
+    });
+    //console.log(data.token.slice(0, 5))
+    const tokens = data.token.slice(0, 100);
+    const testss = null;
 
-  const [selectedFrom, setSelectedFrom] = useState(tokens[0])
-  const [selectedTo, setSelectedTo] = useState(tokens[1])
 
-  return {
-    props: {
-      token: data,
-      selectedFrom: selectedFrom,
-      setSelectedFrom: setSelectedFrom,
-      selectedTo: selectedTo,
-      setSelectedTo: setSelectedTo
-    },
- };
+    return {
+      props: {
+        token: tokens,
+      },
+  };
 }

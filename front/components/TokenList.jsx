@@ -70,8 +70,10 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function TokenList(tokensList, selected, setSelected) {
-  const tokens = tokensList.tokens.token.token.slice(0, 100)
+export default function TokenList(tokensList) {
+  const tokens = tokensList.tokens.token
+  const [selected, setSelected] = useState(tokens[0])
+
 
   return (
     <Listbox value={selected} onChange={setSelected}>
