@@ -5,6 +5,7 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import asyncio
 import requests
 import json
+import time
 
 from constants import UNISWAP_ABI
 from web3 import Web3
@@ -149,11 +150,37 @@ class UniswapConnect:
         
         return result
 
-    async def build_transaction(self, account_address, input_quantity):
-        pass
+    async def build_transaction(self, account_address, input_quantity, swap_path):
+        input_quantity_wei = Web3.toWei(input_quantity, 'ether')
+        min_input_quantity_wei = int(int(input_quantity_wei) * 0.975)
+
+        print("input_quantity_wei: {}, min_input_quantity_wei: {}".format(input_quantity_wei, min_input_quantity_wei))
+
+        deadline = int(time.time() + 60)
+        fun = self.contract.functions.swapExactTokensForTokens(
+            input_quantity_wei,
+            min_input_quantity_wei,
+            swap_path,
+            account_address,
+            deadline
+        )
+        tx = fun.build_transaction({
+            'from': account_address,
+            'nonce': self.w3.eth.getTransactionCount(account_address),
+            'gasPrice': self.w3.toWei('20', 'gwei'),
+            'gas': '0'
+        })
+
+        return tx
 
 async def test():
-    a = await UniswapConnect().get_swap_quote(1, ['0x514910771AF9Ca656af840dff83E8264EcF986CA', '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', '0xD533a949740bb3306d119CC777fa900bA034cd52', ])
+    # LINK -> WETH -> CRV
+    #a = await UniswapConnect().get_swap_quote(1, ['0x514910771AF9Ca656af840dff83E8264EcF986CA', '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', '0xD533a949740bb3306d119CC777fa900bA034cd52', ])
+    
+    # BUILD
+    a = await UniswapConnect().build_transaction('0x707a7E9606b0e1547d7F8401D92222430C348399', '5', ['0x514910771AF9Ca656af840dff83E8264EcF986CA', '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', '0xD533a949740bb3306d119CC777fa900bA034cd52', ])
+
+
     #a = await UniswapConnect().find_optimal_route('0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0', '0xBB0E17EF65F82Ab018d8EDd776e8DD940327B28b')
     print(a)
 
