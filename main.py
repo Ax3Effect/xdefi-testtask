@@ -3,6 +3,8 @@ import asyncio
 import json
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from graphene import ObjectType, List, String, Int, Schema, Field
 from graphene.types import generic
 import graphene
@@ -14,6 +16,20 @@ from uniswap import UniswapConnect
 
 app = FastAPI()
 uni = UniswapConnect()
+
+origins = [
+    'http://localhost:3000',
+    'http://localhost:8000',
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # issues:
 # https://github.com/Uniswap/v3-subgraph/issues/120
@@ -52,16 +68,23 @@ async def resolve_routes(data, info):
 
 
 class Route(ObjectType):
-    from_address = String(required=True)
-    to_address = String(required=True)
+    from_id = String(required=True)
+    from_symbol = String(required=True)
+    from_name = String(required=True)
+    to_id = String(required=True)
+    to_symbol = String(required=True)
+    to_name = String(required=True)
+    side_id = String(required=True)
+    side_symbol = String(required=True)
+    side_name = String(required=True)
     result = generic.GenericScalar(resolver=resolve_routes)
 
 
 class Query(ObjectType):
     token = List(TokenType)
     pairs = List(Pairs)
-    routes = List(Route)
-
+    routes = List(Route, args={'from': String(), 'to': String()})
+ 
     async def resolve_token(self, info):
         return uni.token_list
 

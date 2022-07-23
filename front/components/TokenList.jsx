@@ -1,7 +1,8 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useCallback } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
+
 
 const people = [
   {
@@ -70,13 +71,23 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function TokenList(tokensList) {
-  const tokens = tokensList.tokens.token
-  const [selected, setSelected] = useState(tokens[0])
+export default function TokenList({tokens:tokensList, onSetSelected}) {
+  
+  const tokens = tokensList.token
+  //console.log(tokensList)
+  const [selected, setSelected] = useState(tokens ? tokens[0]  : null)
+  if (!selected) {
+    return <div>Not selected</div>
+  }
 
+  const handleOnChange = useCallback((token) => { 
+    //console.log(token)
+    setSelected(token) 
+    onSetSelected(token) 
+  }, [])
 
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selected} onChange={handleOnChange}>
       {({ open }) => (
         <>
           <Listbox.Label className="block text-sm font-medium text-gray-700">Token</Listbox.Label>

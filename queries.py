@@ -11,8 +11,8 @@ query getToken($tokenid: ID!) {
     ) 
     {
         id,
-        token0 { id, symbol },
-        token1 { id, symbol },
+        token0 { id, symbol, name },
+        token1 { id, symbol, name },
         liquidity,
         feeTier,
         totalValueLockedToken0,
