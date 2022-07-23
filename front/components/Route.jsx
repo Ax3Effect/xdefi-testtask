@@ -66,7 +66,7 @@ export default function Route(props) {
                         </p>
                         <p className="mt-2 flex items-center text-sm text-gray-500">
                             
-                            <span className="truncate">{token.fromSymbol}</span>
+                            <span className="truncate">{token.fromSymbol}: {token.fromPrice}$ | {token.toSymbol}: {token.toPrice}$</span>
                         </p>
                         </div>
                         <div className="hidden md:block">

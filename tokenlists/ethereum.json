@@ -1,5 +1,41 @@
 [
     {
+        "address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+        "symbol": "LINK",
+        "name": "ChainLink Token",
+        "decimals": 18,
+        "chainId": "1",
+        "logoURI": "https://api.rubic.exchange/assets/ethereum/0x514910771af9ca656af840dff83e8264ecf986ca/logo.png",
+        "coingeckoId": "chainlink",
+        "listedIn": [
+            "coingecko",
+            "1inch",
+            "uniswap",
+            "sushiswap",
+            "openocean",
+            "elkfinance",
+            "rubic"
+        ]
+    },
+    {
+        "address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+        "symbol": "CRV",
+        "name": "Curve DAO Token",
+        "decimals": 18,
+        "chainId": "1",
+        "logoURI": "https://api.rubic.exchange/assets/ethereum/0xd533a949740bb3306d119cc777fa900ba034cd52/logo.png",
+        "coingeckoId": "curve-dao-token",
+        "listedIn": [
+            "coingecko",
+            "1inch",
+            "uniswap",
+            "sushiswap",
+            "openocean",
+            "elkfinance",
+            "rubic"
+        ]
+    },
+    {
         "address": "0xfffffffFf15AbF397dA76f1dcc1A1604F45126DB",
         "symbol": "FSW",
         "name": "FalconSwap Token",
@@ -4373,24 +4409,6 @@
             "coingecko",
             "1inch",
             "sushiswap"
-        ]
-    },
-    {
-        "address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
-        "symbol": "CRV",
-        "name": "Curve DAO Token",
-        "decimals": 18,
-        "chainId": "1",
-        "logoURI": "https://api.rubic.exchange/assets/ethereum/0xd533a949740bb3306d119cc777fa900ba034cd52/logo.png",
-        "coingeckoId": "curve-dao-token",
-        "listedIn": [
-            "coingecko",
-            "1inch",
-            "uniswap",
-            "sushiswap",
-            "openocean",
-            "elkfinance",
-            "rubic"
         ]
     },
     {
@@ -11270,24 +11288,6 @@
         "listedIn": [
             "coingecko",
             "1inch"
-        ]
-    },
-    {
-        "address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
-        "symbol": "LINK",
-        "name": "ChainLink Token",
-        "decimals": 18,
-        "chainId": "1",
-        "logoURI": "https://api.rubic.exchange/assets/ethereum/0x514910771af9ca656af840dff83e8264ecf986ca/logo.png",
-        "coingeckoId": "chainlink",
-        "listedIn": [
-            "coingecko",
-            "1inch",
-            "uniswap",
-            "sushiswap",
-            "openocean",
-            "elkfinance",
-            "rubic"
         ]
     },
     {

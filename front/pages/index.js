@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import TokenList from '../components/TokenList.jsx'
+import Profile from '../components/Profile.jsx'
 import Route from '../components/Route.jsx'
 import { gql, useQuery } from "@apollo/client";
 import client from "../apollo-client";
@@ -23,7 +24,7 @@ export async function getStaticProps() {
       }
     `,
   })
-  const tokens = data.token.slice(0, 100);
+  const tokens = data.token.slice(0, 500);
   return {
     props: {
       token: tokens
@@ -44,9 +45,11 @@ export async function bridge(selects) {
         fromId,
         fromSymbol,
         fromName,
+        fromPrice,
         toId,
         toName,
         toSymbol,
+        toPrice,
         sideId,
         sideName,
         sideSymbol
@@ -98,6 +101,7 @@ export default function Home(tokens) {
 
         <p className={styles.description}>
           Get started by selecting input and output tokens{' '}
+          <Profile />
           
         </p>
         <div class="grid grid-cols-2 gap-3">
