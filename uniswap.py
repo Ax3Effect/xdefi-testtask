@@ -73,7 +73,8 @@ class UniswapConnect:
         try:
             destinations1, data1 = await self.process_pool_pairs(from_address)
             destinations2, data2 = await self.process_pool_pairs(to_address)
-        except TypeError:
+        except TypeError as e:
+            print(e)
             return []
 
         already_found = False
@@ -138,8 +139,8 @@ class UniswapConnect:
         token_data = self.get_address_data(address)
         if token_data:
             query = gql(UNISWAP_GET_POOLS)
-            token_id = str(token_data['address'].lower())
-            result = (await self.send_uniswap_request(UNISWAP_GET_POOLS, {'tokenid': token_id}))
+            token_id = str(token_data['address'])
+            result = (await self.send_uniswap_request(UNISWAP_GET_POOLS, {'tokenid': token_id.lower()}))
             return result
     
     async def get_swap_quote(self, input_amount, swap_path):
@@ -156,11 +157,13 @@ class UniswapConnect:
 
         print("input_quantity_wei: {}, min_input_quantity_wei: {}".format(input_quantity_wei, min_input_quantity_wei))
 
+        swap_path_checksums = [Web3.toChecksumAddress(addr) for addr in swap_path]
+
         deadline = int(time.time() + 60)
         fun = self.contract.functions.swapExactTokensForTokens(
             input_quantity_wei,
             min_input_quantity_wei,
-            swap_path,
+            swap_path_checksums,
             account_address,
             deadline
         )

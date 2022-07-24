@@ -1,11 +1,12 @@
 from typing import Union
 import asyncio
 import json
+import uuid
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from graphene import ObjectType, List, String, Int, Schema, Field
+from graphene import ObjectType, List, String, Int, Schema, Field, NonNull
 from graphene.types import generic
 import graphene
 
@@ -29,6 +30,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+route_cache = {}
 
 
 # issues:
@@ -56,18 +59,8 @@ class Pairs(ObjectType):
     feeTier = String()
 
 
-'''
 class Route(ObjectType):
-    class Meta:
-        interfaces = (BaseRoute, )
-'''
-
-async def resolve_routes(data, info):
-    data = (await uni.find_optimal_route(data.from_address, data.to_address))
-    return data
-
-
-class Route(ObjectType):
+    route_id = String(required=True)
     from_id = String(required=True)
     from_symbol = String(required=True)
     from_name = String(required=True)
@@ -79,13 +72,19 @@ class Route(ObjectType):
     side_id = String(required=True)
     side_symbol = String(required=True)
     side_name = String(required=True)
-    result = generic.GenericScalar(resolver=resolve_routes)
+
+class Transaction(ObjectType):
+    data = String(required=True)
+    nonce = String(required=True)
+    to = String(required=True)
+
 
 
 class Query(ObjectType):
     token = List(TokenType)
     pairs = List(Pairs)
     routes = List(Route, args={'from': String(), 'to': String()})
+    transaction = NonNull(Transaction, args={'route_id': String(), 'amount': Int(), 'account_address': String()})
  
     async def resolve_token(self, info):
         return uni.token_list
@@ -98,7 +97,29 @@ class Query(ObjectType):
         from_address = kwargs.get('from')
         to_address = kwargs.get('to')
         data = (await uni.find_optimal_route(from_address, to_address))
+        if data:
+            for route in data:
+                # append route_id to routes
+                uid = str(uuid.uuid4())
+                route_cache[uid] = data
+                route['route_id'] = uid
+
         return data
+    
+    async def resolve_transaction(self, info, **kwargs):
+        route_id = kwargs.get('route_id')
+        amount = kwargs.get('amount')
+        account_address = kwargs.get('account_address')
+        data = route_cache.get(route_id, None)
+        if data:
+            data = data[0]
+            if data.get('side_id') is not None:
+                swap_path = [data['from_id'], data['side_id'], data['to_id']]
+            else:
+                swap_path = [data['from_id'], data['to_id']]
+            uni_transaction = await uni.build_transaction(account_address, amount, swap_path)
+            return uni_transaction
+
 
 class RouteInput(graphene.InputObjectType):
     from_address = graphene.String(required=True)
