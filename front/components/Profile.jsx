@@ -1,7 +1,7 @@
 import { useAccount, useConnect, useDisconnect, useSendTransaction  } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 
-export default function Profile({props}) {
+export default function Profile(props) {
 
 
   const { address, isConnected } = useAccount()
@@ -14,10 +14,10 @@ export default function Profile({props}) {
   const { data, isIdle, isError, isLoading, isSuccess, sendTransaction } =
   useSendTransaction({  
     request: {
-      to: props?.data.data.transaction.to,
+      to: props.data && props?.data.data.transaction.to,
       value: 0, // 1 ETH,
-      nonce: props?.data.data.transaction.nonce,
-      data: props?.data.data.transaction.data,
+      nonce: props.data && props?.data.data.transaction.nonce,
+      data: props.data && props?.data.data.transaction.data,
       gasPrice: 20,
       gasLimit: 200,
     },

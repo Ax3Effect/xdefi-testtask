@@ -73,8 +73,7 @@ class UniswapConnect:
         try:
             destinations1, data1 = await self.process_pool_pairs(from_address)
             destinations2, data2 = await self.process_pool_pairs(to_address)
-        except TypeError as e:
-            print(e)
+        except TypeError:
             return []
 
         already_found = False

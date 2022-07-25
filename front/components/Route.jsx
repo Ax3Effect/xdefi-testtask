@@ -32,13 +32,10 @@ export default function Route(props) {
                         <div className="hidden md:block">
                         <div>
                             <p className="text-sm text-gray-900">
-                            Fees: 
                             </p>
                             <p className="mt-2 flex items-center text-sm text-gray-500">
-                            <CheckCircleIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-green-400" aria-hidden="true" />
-                            Time:
                             </p>
-                            <button class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={() => handleTransaction(token.routeId)}>Go</button>
+                            <button class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={() => handleTransaction(token.routeId)}>Set</button>
                         </div>
                         </div>
                     </div>
