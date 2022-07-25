@@ -7,6 +7,7 @@ import Route from '../components/Route.jsx'
 import { gql, useQuery } from "@apollo/client";
 import client from "../apollo-client";
 import { setState, useState, useCallback } from 'react';
+import { useAccount, useConnect, useDisconnect, useSendTransaction  } from 'wagmi'
 
 export async function getStaticProps() {
   const { data } = await client.query({
@@ -38,10 +39,10 @@ export async function bridge(selects) {
   const toAddress = selects.selectedTo.address
   console.log(fromAddress)
 
-
   const query = gql`
     query Query($from: String, $to: String) {
       routes(from: $from, to: $to) {
+        routeId,
         fromId,
         fromSymbol,
         fromName,
@@ -56,8 +57,6 @@ export async function bridge(selects) {
       }
     }
     `
-
-
   const results = await client.query({
     query: query,
     variables: {from: fromAddress, to: toAddress}},
@@ -70,11 +69,14 @@ export async function bridge(selects) {
 
 
 
+
 export default function Home(tokens) {
 
   const [selectedFrom, setSelectedFrom] = useState(null)
   const [selectedTo, setSelectedTo] = useState(null)
   const [selectedRoutes, setSelectedRoutes] = useState(null)
+  const [inputAmount, setInputAmount] = useState(null)
+  const [transactionData, setTransactionData] = useState(null)
   let routes = null
   //console.log(selectedFrom)
   //console.log(selectedTo)
@@ -83,6 +85,34 @@ export default function Home(tokens) {
     routes = await bridge({selectedFrom, selectedTo})
     console.log(routes)
     setSelectedRoutes({routes})
+  }
+
+  async function makeTransaction(props) {
+    const routeId = props.route_id
+    const inputAmount = props.inputAmount
+    const query = gql`
+      query Transaction($routeId: String, $amount: String) {
+        transaction(routeId: $routeId, amount:$amount, accountAddress:"0x707a7E9606b0e1547d7F8401D92222430C348399") {
+            data
+            nonce
+            to
+        }
+      }
+      `
+    const results = await client.query({
+      query: query,
+      variables: {routeId: routeId, amount: inputAmount}},
+    )
+    return results
+  }
+
+  async function handleTransaction(route_id) {
+    const transaction = await makeTransaction({route_id, inputAmount})
+    console.log(transaction)
+    setTransactionData(transaction)
+
+
+
   }
 
 
@@ -101,10 +131,14 @@ export default function Home(tokens) {
 
         <p className={styles.description}>
           Get started by selecting input and output tokens{' '}
-          <Profile />
+          <Profile data={transactionData} />
           
         </p>
+        <div>
+            <input value={inputAmount} onChange={e => {setInputAmount(e.currentTarget.value)}} class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Input amount"/>
+          </div>
         <div class="grid grid-cols-2 gap-3">
+
           <div>
         <TokenList tokens={tokens} onSetSelected={setSelectedFrom} /> 
           </div>
@@ -116,25 +150,13 @@ export default function Home(tokens) {
       
         <div>
           {selectedRoutes && 
-            <Route data={selectedRoutes.routes.results.data.routes} />
+            <Route data={selectedRoutes.routes.results.data.routes} handleTransaction={handleTransaction} />
           }
         </div>
-
-
         
       </main>
-
       <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
           made by Ax3{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
       </footer>
     </div>
   )

@@ -84,7 +84,7 @@ class Query(ObjectType):
     token = List(TokenType)
     pairs = List(Pairs)
     routes = List(Route, args={'from': String(), 'to': String()})
-    transaction = NonNull(Transaction, args={'route_id': String(), 'amount': Int(), 'account_address': String()})
+    transaction = NonNull(Transaction, args={'route_id': String(), 'amount': String(), 'account_address': String()})
  
     async def resolve_token(self, info):
         return uni.token_list
@@ -108,7 +108,7 @@ class Query(ObjectType):
     
     async def resolve_transaction(self, info, **kwargs):
         route_id = kwargs.get('route_id')
-        amount = kwargs.get('amount')
+        amount = int(kwargs.get('amount'))
         account_address = kwargs.get('account_address')
         data = route_cache.get(route_id, None)
         if data:
@@ -133,7 +133,6 @@ class CreateRoute(graphene.Mutation):
 
     def mutate(root, info, address=None):
         data = (uni.find_optimal_route(address.from_address, to_address=address.to_address))
-        print(data)
         route = Route(from_address=address.from_address, to_address=address.to_address)
         return CreateRoute(route=route)
 
